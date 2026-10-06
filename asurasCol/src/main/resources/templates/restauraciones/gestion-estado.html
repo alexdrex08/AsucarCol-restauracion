@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(titulo='Gestión de Estado - Asuras Col')}"></head>
+
+<body class="toggled">
+    <header th:replace="~{fragments/header :: header}"></header>
+    <div class="d-flex" id="wrapper">
+        <div th:replace="~{fragments/sidebar :: menu}"></div>
+        <div id="page-content-wrapper">
+            <main class="container-fluid p-4 my-5">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-0">
+                            <i class="fa-solid fa-arrows-rotate text-warning me-2"></i>
+                            Gestión de Estado
+                        </h2>
+                        <p class="text-muted small mb-0" th:text="${restauracion.numeroSpv}"></p>
+                    </div>
+                    <a th:href="@{'/restauraciones/' + ${restauracion.id}}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Volver al detalle
+                    </a>
+                </div>
+
+                <div id="alertaAjax" class="alert d-none py-2 mb-3"></div>
+
+                <div class="row g-4">
+                    <!-- FORMULARIO -->
+                    <div class="col-12 col-lg-5">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-white fw-bold border-bottom">
+                                <i class="fa-solid fa-pen-to-square me-2 text-primary"></i>Registrar cambio
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Estado actual</label>
+                                    <p class="mb-0">
+                                        <span class="badge bg-secondary fs-6"
+                                            th:text="${restauracion.estadoActual}"></span>
+                                    </p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Nuevo estado *</label>
+                                    <select id="selectEstadoNuevo" class="form-select" required>
+                                        <option value="">Selecciona...</option>
+                                        <option th:each="e : ${estados}" th:value="${e.id}" th:text="${e.nombre}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <!-- Guía requerida si pasa a Garantía sin tener -->
+                                <div id="bloqueGuia" class="d-none">
+                                    <div class="alert alert-info py-2 mb-2 small">
+                                        <i class="fa-solid fa-info-circle me-1"></i>
+                                        Se requiere asignar una guía para este estado.
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">N° Guía</label>
+                                        <input type="text" id="inputGuiaEstado" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Transportadora</label>
+                                        <input type="text" id="inputTransportadoraEstado" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">
+                                        Comentario <span class="text-muted fw-normal">(opcional)</span>
+                                    </label>
+                                    <textarea id="inputComentarioEstado" class="form-control" rows="3"
+                                        placeholder="Ej: Se envía WhatsApp al cliente..."></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">
+                                        Fotos <span class="text-muted fw-normal">(máximo 4, opcional)</span>
+                                    </label>
+                                    <input type="file" id="inputFotosEstado" class="form-control" accept="image/*"
+                                        multiple>
+                                    <div id="previewFotosEstado" class="row g-2 mt-2"></div>
+                                </div>
+
+                                <button class="btn btn-warning text-dark fw-bold w-100" onclick="cambiarEstado()"
+                                    id="btnCambiarEstado">
+                                    <i class="fa-solid fa-check me-1"></i>Registrar cambio
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HISTORIAL -->
+                    <div class="col-12 col-lg-7">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-white fw-bold border-bottom">
+                                <i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Historial
+                            </div>
+                            <div class="card-body" id="historialContainer">
+                                <div th:each="h : ${restauracion.historial}"
+                                    class="border-start border-3 border-primary ps-3 mb-3">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <span class="badge bg-primary" th:text="${h.estadoNuevo}"></span>
+                                            <small class="text-muted ms-2"
+                                                th:text="${#temporals.format(h.fecha, 'dd/MM/yyyy HH:mm')}"></small>
+                                        </div>
+                                        <small class="text-muted" th:text="${h.usuarioNombre}"></small>
+                                    </div>
+                                    <p class="small mb-1 mt-2" th:if="${h.comentario}" th:text="${h.comentario}"></p>
+                                    <div th:if="${h.fotos != null and !h.fotos.isEmpty()}" class="d-flex gap-2 mt-2">
+                                        <a th:each="f : ${h.fotos}" th:href="${f.urlFoto}" target="_blank">
+                                            <img th:src="${f.urlFoto}" class="rounded"
+                                                style="width:60px; height:60px; object-fit:cover;">
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <script th:replace="~{fragments/scripts :: scripts}"></script>
+
+    <!-- MODAL DE CONFIRMACIÓN -->
+    <div th:replace="~{fragments/modal-confirmacion :: modalConfirmacion}"></div>
+    <div th:replace="~{fragments/modal-confirmacion :: modalScripts}"></div>
+
+    <script th:inline="javascript">
+        const RESTAURACION_ID = /*[[${restauracion.id}]]*/ 0;
+    </script>
+    <script th:src="@{/js/restauracion/gestion-estado.js}"></script>
+
+</body>
+
+</html>

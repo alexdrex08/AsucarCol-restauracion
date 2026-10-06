@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(titulo='Nueva Restauración - Asuras Col')}"></head>
+
+<body class="toggled">
+    <header th:replace="~{fragments/header :: header}"></header>
+    <div class="d-flex" id="wrapper">
+        <div th:replace="~{fragments/sidebar :: menu}"></div>
+        <div id="page-content-wrapper">
+            <main class="container-fluid p-4 my-5">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="fw-bold mb-0">
+                        <i class="fa-solid fa-plus text-primary me-2"></i>Nueva Restauración
+                    </h2>
+                    <a th:href="@{/restauraciones}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Volver
+                    </a>
+                </div>
+
+                <div id="alertaAjax" class="alert d-none py-2 mb-3"></div>
+
+                <form id="formRestauracion" enctype="multipart/form-data">
+                    <div class="row g-4">
+                        <div class="col-12 col-lg-8">
+
+                            <!-- SPV -->
+                            <div class="card shadow-sm border-0 mb-3">
+                                <div class="card-header bg-white fw-bold border-bottom">
+                                    <i class="fa-solid fa-barcode me-2 text-primary"></i>N° SPV
+                                </div>
+                                <div class="card-body">
+                                    <label class="form-label small fw-bold">Código de restauración *</label>
+                                    <div class="input-group input-group-lg">
+                                        <span class="input-group-text font-monospace bg-light"
+                                            th:text="${prefijoSpv}">0000000000</span>
+                                        <input type="text" id="inputSpv" class="form-control font-monospace" required
+                                            placeholder="Dígitos restantes" pattern="[0-9]+" inputmode="numeric"
+                                            title="Solo números">
+                                    </div>
+                                    <small class="text-muted">
+                                        SPV final = <span class="font-monospace" th:text="${prefijoSpv}"></span>
+                                        + los dígitos que ingreses.
+                                    </small>
+                                </div>
+                            </div>
+
+                            <!-- CLIENTE -->
+                            <div class="card shadow-sm border-0 mb-3">
+                                <div class="card-header bg-white fw-bold border-bottom">
+                                    <i class="fa-solid fa-user me-2 text-info"></i>Cliente
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-2 align-items-end mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Cédula</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text"><i
+                                                        class="fa-solid fa-id-card"></i></span>
+                                                <input type="text" id="inputCcCliente" class="form-control" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <button type="button" class="btn btn-outline-info w-100"
+                                                onclick="buscarClientePorCc()">
+                                                <i class="fa-solid fa-magnifying-glass"></i> Buscar
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Cliente encontrado -->
+                                    <div id="clienteEncontrado" class="alert alert-success d-none py-2">
+                                        <i class="fa-solid fa-circle-check me-2"></i>
+                                        <strong id="nombreClienteEncontrado"></strong>
+                                        <button type="button" class="btn-close float-end"
+                                            onclick="limpiarCliente()"></button>
+                                    </div>
+
+                                    <!-- Cliente no encontrado: se llenan los datos manualmente -->
+                                    <div id="formClienteNuevo" class="d-none">
+                                        <div class="alert alert-warning py-2 mb-3">
+                                            <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                                            Cliente no encontrado. Los datos se usarán para registrar la restauración.
+                                            Al guardar, se preguntará si deseas crear el cliente.
+                                        </div>
+                                        <div class="row g-2">
+                                            <div class="col-md-6">
+                                                <label class="form-label small fw-bold">Nombre completo</label>
+                                                <input type="text" id="inputNombreCliente" class="form-control">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small fw-bold">Teléfono</label>
+                                                <input type="text" id="inputTelefonoCliente" class="form-control">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label class="form-label small fw-bold">Correo</label>
+                                                <input type="email" id="inputCorreoCliente" class="form-control">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PRODUCTO -->
+                            <div class="card shadow-sm border-0 mb-3">
+                                <div class="card-header bg-white fw-bold border-bottom">
+                                    <i class="fa-solid fa-box me-2 text-primary"></i>Producto a Restaurar
+                                </div>
+                                <div class="card-body">
+                                    <div class="position-relative mb-3">
+                                        <label class="form-label small fw-bold">Tipo de restauración *</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i
+                                                    class="fa-solid fa-magnifying-glass"></i></span>
+                                            <input type="text" id="inputTipoRestauracion" class="form-control"
+                                                placeholder="Tipo de REST..." autocomplete="off" required>
+                                        </div>
+                                        <div id="resultadosTipo" class="list-group position-absolute z-3 shadow"
+                                            style="display:none; width:100%; top:100%; max-height:250px; overflow-y:auto;">
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="inputIdTipoRestauracion">
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Artículo *</label>
+                                        <input type="text" id="inputArticulo" class="form-control" required
+                                            placeholder="Ej: Bolso de cuero">
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Descripción</label>
+                                        <textarea id="inputDescripcion" class="form-control" rows="2"
+                                            placeholder="Detalles adicionales..."></textarea>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label small fw-bold">Observaciones</label>
+                                        <textarea id="inputObservaciones" class="form-control" rows="2"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FOTOS -->
+                            <div class="card shadow-sm border-0 mb-3">
+                                <div class="card-header bg-white fw-bold border-bottom">
+                                    <i class="fa-solid fa-camera me-2 text-secondary"></i>Fotos (máximo 4)
+                                </div>
+                                <div class="card-body">
+                                    <input type="file" id="inputFotos" class="form-control" accept="image/*" multiple>
+                                    <small class="text-muted">Fotos del artículo y/o factura de restauración.</small>
+                                    <div id="previewFotos" class="row g-2 mt-3"></div>
+                                </div>
+                            </div>
+
+                            <!-- GUÍA OPCIONAL -->
+                            <div class="card shadow-sm border-0 mb-3">
+                                <div class="card-header bg-white fw-bold border-bottom">
+                                    <i class="fa-solid fa-truck me-2 text-warning"></i>Guía (opcional)
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">N° de guía</label>
+                                            <input type="text" id="inputGuia" class="form-control">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label small fw-bold">Transportadora</label>
+                                            <input type="text" id="inputTransportadora" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- BOTÓN -->
+                        <div class="col-12 col-lg-4">
+                            <div class="card shadow-sm border-0 sticky-top" style="top: 1rem;">
+                                <div class="card-body text-center">
+                                    <i class="fa-solid fa-clipboard-check fa-3x text-primary mb-3"></i>
+                                    <h6 class="fw-bold">Guardar Restauración</h6>
+                                    <p class="text-muted small">
+                                        El producto quedará en estado <strong>Borrador</strong> hasta asignarle una
+                                        guía.
+                                    </p>
+                                    <button type="submit" class="btn btn-primary w-100 fw-bold" id="btnGuardar">
+                                        <i class="fa-solid fa-floppy-disk me-1"></i>Guardar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL CREAR CLIENTE -->
+    <div class="modal fade" id="modalCrearCliente" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">
+                        <i class="fa-solid fa-user-plus me-2"></i>Cliente no registrado
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <p>El cliente no existe en el sistema. ¿Deseas registrarlo con estos datos?</p>
+                    <ul class="list-group small">
+                        <li class="list-group-item"><strong>CC:</strong> <span id="modalCc"></span></li>
+                        <li class="list-group-item"><strong>Nombre:</strong> <span id="modalNombre"></span></li>
+                        <li class="list-group-item"><strong>Teléfono:</strong> <span id="modalTelefono"></span></li>
+                        <li class="list-group-item"><strong>Correo:</strong> <span id="modalCorreo"></span></li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                        No, solo guardar restauración
+                    </button>
+                    <button type="button" class="btn btn-warning text-dark fw-bold" id="btnConfirmarCrearCliente">
+                        <i class="fa-solid fa-check me-1"></i>Sí, crear cliente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <script th:replace="~{fragments/scripts :: scripts}"></script>
+
+    <!-- MODAL DE CONFIRMACIÓN -->
+    <div th:replace="~{fragments/modal-confirmacion :: modalConfirmacion}"></div>
+    <div th:replace="~{fragments/modal-confirmacion :: modalScripts}"></div>
+
+    <script th:src="@{/js/restauracion/crear-restauracion.js}"></script>
+
+</body>
+
+</html>

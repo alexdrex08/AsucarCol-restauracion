@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(titulo='Detalle Restauración - Asuras Col')}"></head>
+
+<body class="toggled">
+    <header th:replace="~{fragments/header :: header}"></header>
+    <div class="d-flex" id="wrapper">
+        <div th:replace="~{fragments/sidebar :: menu}"></div>
+        <div id="page-content-wrapper">
+            <main class="container-fluid p-4 my-5">
+
+                <!-- ENCABEZADO -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-0">
+                            <i class="fa-solid fa-screwdriver-wrench text-primary me-2"></i>
+                            <span th:text="${restauracion.numeroSpv}"></span>
+                        </h2>
+                        <p class="text-muted small mb-0">
+                            <span th:text="${restauracion.tipoRestauracionTipo}"></span> ·
+                            <span th:text="${restauracion.tipoRestauracionDescripcion}"></span>
+                        </p>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{'/restauraciones/' + ${restauracion.id} + '/gestion'}"
+                            class="btn btn-warning text-dark btn-sm">
+                            <i class="fa-solid fa-arrows-rotate me-0 me-sm-1"></i>
+                            <span class="d-none d-sm-inline ms-1">Gestionar estado</span>
+                        </a>
+                        <a th:href="@{/restauraciones}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fa-solid fa-arrow-left me-0 me-sm-1"></i>
+                            <span class="d-none d-sm-inline ms-1">Volver</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- INFO PRINCIPAL -->
+                    <div class="col-12 col-lg-4">
+                        <div class="card shadow-sm border-0 mb-3">
+                            <div class="card-header bg-white fw-bold border-bottom">
+                                <i class="fa-solid fa-circle-info me-2 text-primary"></i>Información
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-2 small"><strong>Cliente:</strong>
+                                    <span th:text="${restauracion.cliente.nombre}"></span>
+                                </p>
+                                <p class="mb-2 small"><strong>CC:</strong>
+                                    <span th:text="${restauracion.cliente.identificacion}"></span>
+                                </p>
+                                <p class="mb-2 small"><strong>Teléfono(s):</strong>
+                                    <span
+                                        th:if="${restauracion.cliente.telefonos != null and !restauracion.cliente.telefonos.isEmpty()}">
+                                        <span th:each="t, stat : ${restauracion.cliente.telefonos}">
+                                            <span th:text="${t}"></span><span th:if="${!stat.last}">, </span>
+                                        </span>
+                                    </span>
+                                    <span
+                                        th:unless="${restauracion.cliente.telefonos != null and !restauracion.cliente.telefonos.isEmpty()}"
+                                        th:text="${restauracion.telefonoContacto} ?: '—'"></span>
+                                </p>
+                                <p class="mb-2 small"><strong>Correo(s):</strong>
+                                    <span
+                                        th:if="${restauracion.cliente.correos != null and !restauracion.cliente.correos.isEmpty()}">
+                                        <span th:each="c, stat : ${restauracion.cliente.correos}">
+                                            <span th:text="${c}"></span><span th:if="${!stat.last}">, </span>
+                                        </span>
+                                    </span>
+                                    <span
+                                        th:unless="${restauracion.cliente.correos != null and !restauracion.cliente.correos.isEmpty()}"
+                                        th:text="${restauracion.correoContacto} ?: '—'"></span>
+                                </p>
+                                <hr>
+                                <p class="mb-2 small"><strong>Artículo:</strong>
+                                    <span th:text="${restauracion.articulo}"></span>
+                                </p>
+                                <p class="mb-2 small"><strong>Descripción:</strong>
+                                    <span th:text="${restauracion.descripcion} ?: '—'"></span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm border-0 mb-3">
+                            <div class="card-header bg-white fw-bold border-bottom">
+                                <i class="fa-solid fa-timeline me-2 text-warning"></i>Trazabilidad
+                            </div>
+                            <div class="card-body small">
+                                <p class="mb-2"><strong>Creado:</strong>
+                                    <span
+                                        th:text="${#temporals.format(restauracion.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></span>
+                                    por <em th:text="${restauracion.usuarioRegistra}"></em>
+                                </p>
+                                <p class="mb-2"><strong>Llegada a tienda:</strong>
+                                    <span
+                                        th:text="${restauracion.fechaLlegadaTienda != null ? #temporals.format(restauracion.fechaLlegadaTienda, 'dd/MM/yyyy HH:mm') : '—'}"></span>
+                                </p>
+                                <p class="mb-2"><strong>Entrega:</strong>
+                                    <span
+                                        th:text="${restauracion.fechaEntrega != null ? #temporals.format(restauracion.fechaEntrega, 'dd/MM/yyyy HH:mm') : '—'}"></span>
+                                    <span th:if="${restauracion.usuarioEntrega != null}"
+                                        th:text="' por ' + ${restauracion.usuarioEntrega}"></span>
+                                </p>
+                                <p class="mb-0"><strong>Devolución:</strong>
+                                    <span
+                                        th:text="${restauracion.fechaDevolucion != null ? #temporals.format(restauracion.fechaDevolucion, 'dd/MM/yyyy HH:mm') : '—'}"></span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- GUÍAS -->
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-white fw-bold border-bottom">
+                                <i class="fa-solid fa-truck me-2 text-secondary"></i>Guías
+                            </div>
+                            <div class="card-body p-0">
+                                <div th:if="${restauracion.guias == null or restauracion.guias.isEmpty()}"
+                                    class="text-center text-muted py-3 small">
+                                    Sin guías asignadas
+                                </div>
+                                <ul th:if="${restauracion.guias != null and !restauracion.guias.isEmpty()}"
+                                    class="list-group list-group-flush">
+                                    <li th:each="g : ${restauracion.guias}" class="list-group-item small">
+                                        <div class="d-flex justify-content-between">
+                                            <span class="font-monospace fw-bold" th:text="${g.numeroGuia}"></span>
+                                            <span class="text-muted"
+                                                th:text="${g.fechaCreacion != null ? #temporals.format(g.fechaCreacion, 'dd/MM/yyyy') : ''}"></span>
+                                        </div>
+                                        <div class="text-muted" th:text="${g.transportadora} ?: ''"></div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- HISTORIAL (TIMELINE) -->
+                    <div class="col-12 col-lg-8">
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-white fw-bold border-bottom d-flex justify-content-between">
+                                <span><i class="fa-solid fa-clock-rotate-left me-2 text-primary"></i>Historial</span>
+                                <span class="badge bg-secondary"
+                                    th:text="${#lists.size(restauracion.historial)} + ' evento(s)'"></span>
+                            </div>
+                            <div class="card-body">
+                                <div class="timeline">
+                                    <div th:each="h : ${restauracion.historial}" class="timeline-item mb-4">
+                                        <div class="d-flex gap-3">
+                                            <div class="timeline-badge
+                                                flex-shrink-0 rounded-circle d-flex align-items-center
+                                                justify-content-center"
+                                                th:classappend="${h.esAutomatico} ? 'bg-secondary' : 'bg-primary'"
+                                                style="width:40px; height:40px;">
+                                                <i class="fa-solid fa-circle-check text-white"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex justify-content-between align-items-start flex-wrap">
+                                                    <div>
+                                                        <span class="badge bg-primary me-1"
+                                                            th:text="${h.estadoNuevo}"></span>
+                                                        <small class="text-muted" th:if="${h.estadoAnterior != null}"
+                                                            th:text="'desde ' + ${h.estadoAnterior}"></small>
+                                                        <span class="badge bg-secondary ms-2" th:if="${h.esAutomatico}">
+                                                            Automático
+                                                        </span>
+                                                    </div>
+                                                    <small class="text-muted"
+                                                        th:text="${#temporals.format(h.fecha, 'dd/MM/yyyy HH:mm')}"></small>
+                                                </div>
+                                                <div class="small text-muted mt-1">
+                                                    <i class="fa-solid fa-user me-1"></i>
+                                                    <span th:text="${h.usuarioNombre}"></span>
+                                                </div>
+                                                <p class="mb-2 mt-2 small" th:if="${h.comentario != null}"
+                                                    th:text="${h.comentario}"></p>
+
+                                                <div th:if="${h.fotos != null and !h.fotos.isEmpty()}"
+                                                    class="d-flex flex-wrap gap-2 mt-2">
+                                                    <a th:each="f : ${h.fotos}" th:href="${f.urlFoto}" target="_blank">
+                                                        <img th:src="${f.urlFoto}" class="rounded"
+                                                            style="width:80px; height:80px; object-fit:cover;">
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <script th:replace="~{fragments/scripts :: scripts}"></script>
+    <style>
+        .timeline-item {
+            position: relative;
+        }
+
+        .timeline-item:not(:last-child)::before {
+            content: '';
+            position: absolute;
+            left: 19px;
+            top: 44px;
+            bottom: -1rem;
+            width: 2px;
+            background-image: linear-gradient(to bottom, #dee2e6 50%, transparent 50%);
+            background-size: 2px 8px;
+            background-repeat: repeat-y;
+        }
+    </style>
+
+</body>
+
+</html>

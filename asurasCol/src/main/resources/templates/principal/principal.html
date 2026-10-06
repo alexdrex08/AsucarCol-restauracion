@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(titulo='Inicio -  Asuras Col', linksExtra=~{})}"></head>
+
+<body class="toggled">
+    <header th:replace="~{fragments/header ::  header}"></header>
+    <div class="d-flex" id="wrapper">
+        <div th:replace="~{fragments/sidebar :: menu}"></div>
+        <div class="page-content-wrapper">
+            <main class="container-fluid py-5 px-4" id="inicio-container">
+
+                <section class="text-center mb-5">
+                    <h1 class="fw-bold display-5 text-primary mb-3">¡Bienvenido <strong th:text="${usuario}"
+                            class="text-dark"></strong> a <span class="text-dark" th:text="${nombreSistema}">
+                        </span>!
+                    </h1>
+                    <p class="lead text-muted">
+                        Tu aliado digital para el control, gestión y seguimiento de restauraciones
+                        y clientes. Registra, asigna guías y da trazabilidad a cada producto
+                        desde un mismo entorno moderno y seguro.
+                    </p>
+
+                    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show shadow-sm">
+                        <i class="fa-solid fa-circle-check me-2"></i><span th:text="${mensaje}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm">
+                        <i class="fa-solid fa-circle-exclamation me-2"></i><span th:text="${error}"></span>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                </section>
+
+                <section class="row justify-content-center mb-5">
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm bg-light p-4">
+                            <div class="card-body text-center">
+                                <i class="fa-solid fa-screwdriver-wrench fa-3x text-primary mb-3"></i>
+                                <h4 class="fw-bold mb-3">Gestión inteligente de restauraciones</h4>
+                                <p class="text-muted">
+                                    En <strong th:text="${nombreSistema}"></strong> simplificamos tus procesos. Registra
+                                    restauraciones por SPV, asígnales guía y transportadora, gestiona sus
+                                    estados con historial y fotos, y mantén la ficha de cada cliente siempre
+                                    actualizada.
+                                </p>
+                                <a th:href="@{/dashboard}" class="btn btn-primary mt-3">
+                                    <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Ir al Dashboard
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ACCESOS RÁPIDOS A MÓDULOS MAS IMPORTANTES DEL APLICATIVO -->
+                <section class="row text-center g-4 mb-5">
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100 hover-card">
+                            <div class="card-body">
+                                <i class="fa-solid fa-screwdriver-wrench fa-2x text-primary mb-3"></i>
+                                <h5 class="fw-bold">Restauraciones</h5>
+                                <p class="text-muted small mb-1">Registra y da seguimiento a cada restauración.</p>
+                                <p class="fw-bold text-primary mb-3">
+                                    <span th:text="${totalRestauraciones}"></span> registrada(s)
+                                </p>
+                                <a th:href="@{/restauraciones}" class="btn btn-outline-primary btn-sm">Entrar</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100 hover-card">
+                            <div class="card-body">
+                                <i class="fa-solid fa-users fa-2x text-info mb-3"></i>
+                                <h5 class="fw-bold">Clientes</h5>
+                                <p class="text-muted small mb-1">Consulta y gestiona tus clientes activos.</p>
+                                <p class="fw-bold text-info mb-3">
+                                    <span th:text="${totalClientes}"></span> cliente(s)
+                                </p>
+                                <a th:href="@{/clientes}" class="btn btn-outline-info btn-sm text-dark">Ver más</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100 hover-card">
+                            <div class="card-body">
+                                <i class="fa-solid fa-user-gear fa-2x text-warning mb-3"></i>
+                                <h5 class="fw-bold">Usuarios</h5>
+                                <p class="text-muted small mb-1"
+                                    th:text="${esAdmin ? 'Administra los usuarios y sus roles.' : 'Conoce a tus compañeros de equipo'}">
+                                </p>
+
+                                </p>
+                                <p class="fw-bold text-warning mb-3">
+                                    <span th:text="${totalUsuarios}"></span> usuario(s)
+                                </p>
+                                <a th:href="@{/usuarios}" class="btn btn-outline-warning btn-sm">Ver más</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100 hover-card">
+                            <div class="card-body">
+                                <i class="fa-solid fa-gear fa-2x text-success mb-3"></i>
+                                <h5 class="fw-bold">Parámetros</h5>
+                                <p class="text-muted small mb-1"
+                                    th:text="${esAdmin ? 'Configura tienda, región y demás parámetros.' : 'Conoce variables del sistema y de tu Zona.'}">
+                                </p>
+                                <p class="fw-bold text-success mb-3">
+                                    <span th:text="${totalParametros}"></span> parámetro(s)
+                                </p>
+                                <a th:href="@{/configuracion/sistema}" class="btn btn-outline-success btn-sm">
+                                    <span th:text="${esAdmin ? 'Configurar' : 'Ver más'}">
+
+                                    </span></a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="row align-items-center my-5">
+                    <div class="col-md-6 mb-4 mb-md-0">
+                        <img th:src="@{/img/ref.jpeg}" alt="Vista previa del sistema"
+                            class="img-fluid rounded shadow-sm">
+                    </div>
+                    <div class="col-md-6">
+                        <h3 class="fw-bold mb-3"><i class="fa-solid fa-circle-info me-2 text-primary"></i>Sobre <span
+                                class="fw-bold mb-3" th:text="${nombreSistema}"></span>
+                        </h3>
+                        <p class="text-muted mb-4">
+                            Este sistema fue diseñado para brindar control total del registro y
+                            seguimiento de restauraciones, así como de la información de cada cliente.
+                            Su interfaz combina simplicidad y precisión, pensada para mejorar los flujos
+                            de trabajo y la trazabilidad de los procesos.
+                        </p>
+                        <ul class="list-unstyled text-muted small">
+                            <li>✔ Registro rápido de restauraciones por SPV</li>
+                            <li>✔ Asignación de guías y agrupación por transportadora</li>
+                            <li>✔ Seguimiento de estados con historial y fotos</li>
+                            <li>✔ Ficha de clientes con correos, teléfonos y direcciones</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- BLOQUE FINAL DEL CONTENIDO PRINCIPAL -->
+                <section class="text-center bg-dark text-white rounded py-5 mt-5 shadow-sm">
+                    <h2 class="fw-bold mb-3">“Control y confianza en cada registro”</h2>
+                    <p class="text-white-50 mb-4">
+                        Mantén tus restauraciones bajo control y optimiza la gestión de tus clientes.
+                    </p>
+                    <a th:href="@{/dashboard}" class="btn btn-outline-light btn-lg">
+                        <i class="fa-solid fa-rocket me-2"></i>Comenzar ahora
+                    </a>
+                </section>
+
+            </main>
+        </div>
+
+    </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <script th:replace="~{fragments/scripts :: scripts}"></script>
+</body>
+
+</html>

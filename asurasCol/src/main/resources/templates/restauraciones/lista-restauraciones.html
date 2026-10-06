@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(titulo='Restauraciones - Asuras Col')}"></head>
+
+<body class="toggled">
+    <header th:replace="~{fragments/header :: header}"></header>
+    <div class="d-flex" id="wrapper">
+        <div th:replace="~{fragments/sidebar :: menu}"></div>
+        <div id="page-content-wrapper">
+            <main class="container-fluid p-4 my-5">
+
+                <!-- ENCABEZADO -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-0">
+                            <i class="fa-solid fa-screwdriver-wrench text-primary me-2"></i>Restauraciones
+                        </h2>
+                        <p class="text-muted small mb-0">
+                            <span th:text="${totalRestauraciones}"></span> restauración(es) registrada(s)
+                        </p>
+                    </div>
+                    <a th:href="@{/restauraciones/nueva}" class="btn btn-primary">
+                        <i class="fa-solid fa-plus me-0 me-sm-1"></i>
+                        <span class="d-none d-sm-inline ms-1">Nueva Restauración</span>
+                    </a>
+                </div>
+
+                <!-- FLASH -->
+                <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show shadow-sm">
+                    <i class="fa-solid fa-circle-check me-2"></i><span th:text="${mensaje}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm">
+                    <i class="fa-solid fa-circle-exclamation me-2"></i><span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <!-- TARJETAS RESUMEN -->
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm border-0 p-3 h-100 text-center">
+                            <i class="fa-solid fa-list fa-2x text-primary mb-2"></i>
+                            <p class="text-muted small mb-1">Total</p>
+                            <h3 class="fw-bold mb-0" th:text="${totalRestauraciones}">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm border-0 p-3 h-100 text-center">
+                            <i class="fa-solid fa-spinner fa-2x text-warning mb-2"></i>
+                            <p class="text-muted small mb-1">En proceso</p>
+                            <h3 class="fw-bold mb-0" id="contadorProceso">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm border-0 p-3 h-100 text-center">
+                            <i class="fa-solid fa-circle-check fa-2x text-success mb-2"></i>
+                            <p class="text-muted small mb-1">Entregados</p>
+                            <h3 class="fw-bold mb-0" id="contadorEntregados">0</h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card shadow-sm border-0 p-3 h-100 text-center">
+                            <i class="fa-solid fa-rotate-left fa-2x text-danger mb-2"></i>
+                            <p class="text-muted small mb-1">Devueltos</p>
+                            <h3 class="fw-bold mb-0" id="contadorDevueltos">0</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FILTROS -->
+                <div class="card shadow-sm border-0 mb-3">
+                    <div class="card-body">
+                        <!-- Fila 1: Filtros -->
+                        <div class="row g-2">
+                            <div class="col-12 col-md-3">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light">
+                                        <i class="fa-solid fa-magnifying-glass text-muted"></i>
+                                    </span>
+                                    <input type="text" id="buscarRestauracion" class="form-control"
+                                        placeholder="SPV, cliente o CC...">
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <select id="filtroEstado" class="form-select">
+                                    <option value="">Todos los estados</option>
+                                    <option th:each="e : ${estados}" th:value="${e.nombre}" th:text="${e.nombre}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <select id="filtroTipo" class="form-select">
+                                    <option value="">Todos los tipos</option>
+                                    <option th:each="t : ${tiposRestauracion}" th:value="${t.tipo}"
+                                        th:text="${t.tipo} + ' - ' + ${t.descripcion}"></option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-2">
+                                <input type="date" id="filtroFecha" class="form-control">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <button id="limpiarFiltros" class="btn btn-outline-secondary w-100">
+                                    <i class="fa-solid fa-rotate-left me-1"></i>Limpiar
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Separador visual -->
+                        <hr class="my-3 text-muted opacity-25">
+
+                        <!-- Fila 2: Agrupación y guía -->
+                        <div class="row g-3 align-items-center">
+                            <div class="col-12 col-md-6">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" id="agruparPorGuia">
+                                    <label class="form-check-label small fw-semibold" for="agruparPorGuia">
+                                        <i class="fa-solid fa-layer-group me-1"></i>Agrupar restauraciones por guía
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <div class="d-flex gap-2 justify-content-md-end">
+                                    <input type="text" id="inputNumeroGuia" class="form-control form-control-sm"
+                                        placeholder="N° de guía" style="max-width: 200px;">
+                                    <button class="btn btn-sm btn-outline-primary text-nowrap"
+                                        onclick="asignarGuiaSeleccionadas()">
+                                        <i class="fa-solid fa-truck me-1"></i>Asignar guía
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TABLA/LISTA -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-white fw-bold d-flex justify-content-between align-items-center">
+                        <span><i class="fa-solid fa-list me-2 text-secondary"></i>Listado</span>
+                        <span class="badge bg-secondary" id="contadorSeleccionadas">0 seleccionadas</span>
+                    </div>
+                    <div class="card-body table-wrapper table-rounded">
+                        <div class="table-responsive-premium">
+                            <table class="table table-premium">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3" style="width:40px;">
+                                            <input type="checkbox" id="checkAll" class="form-check-input">
+                                        </th>
+                                        <th># SPV</th>
+                                        <th>Cliente</th>
+                                        <th>Tipo</th>
+                                        <th>Artículo</th>
+                                        <th>Estado</th>
+                                        <th>Guía</th>
+                                        <th>Fecha</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaRestauraciones">
+                                    <tr th:if="${restauraciones == null or restauraciones.isEmpty()}">
+                                        <td colspan="9" class="text-center text-muted py-4">
+                                            <i class="fa-solid fa-folder-open me-2"></i>
+                                            No hay restauraciones registradas.
+                                        </td>
+                                    </tr>
+                                    <tr th:each="r : ${restauraciones}" th:attr="data-nombre=${#strings.toLowerCase(r.numeroSpv + ' ' + r.nombreCliente + ' ' + r.identificacionCliente)},
+                                                 data-estado=${r.estadoActual},
+                                                 data-tipo=${r.tipoRestauracion},
+                                                 data-fecha=${r.fechaCreacion != null ? #temporals.format(r.fechaCreacion, 'yyyy-MM-dd') : ''},
+                                                 data-guia=${r.ultimaGuia != null ? r.ultimaGuia : 'SIN_GUIA'},
+                                                 data-id=${r.id}">
+                                        <td class="ps-3">
+                                            <input type="checkbox" class="form-check-input check-restauracion"
+                                                th:value="${r.id}">
+                                        </td>
+                                        <td class="fw-bold" th:text="${r.numeroSpv}"></td>
+                                        <td>
+                                            <div class="fw-semibold small" th:text="${r.nombreCliente}"></div>
+                                            <div class="text-muted small" th:text="${r.identificacionCliente}"></div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info text-dark"
+                                                th:text="${r.tipoRestauracion}"></span>
+                                        </td>
+                                        <td class="small" th:text="${r.descripcionTipo}"></td>
+                                        <td>
+                                            <span class="badge"
+                                                th:classappend="${r.estadoActual == 'Finalizado'} ? 'bg-success' :
+                                                                (${r.estadoActual == 'Entregado'} ? 'bg-primary' :
+                                                                (${r.estadoActual == 'Devuelto Taller'} ? 'bg-danger' :
+                                                                (${r.estadoActual == 'Borrador'} ? 'bg-secondary' : 'bg-warning text-dark')))"
+                                                th:text="${r.estadoActual}"></span>
+                                        </td>
+                                        <td class="small">
+                                            <span th:if="${r.ultimaGuia != null}" class="font-monospace"
+                                                th:text="${r.ultimaGuia}"></span>
+                                            <span th:if="${r.ultimaGuia == null}" class="text-muted fst-italic">
+                                                Sin guía
+                                            </span>
+                                        </td>
+                                        <td class="small text-muted"
+                                            th:text="${r.fechaCreacion != null ? #temporals.format(r.fechaCreacion, 'dd/MM/yyyy') : '—'}">
+                                        </td>
+                                        <td class="text-center">
+                                            <a th:href="@{'/restauraciones/' + ${r.id}}"
+                                                class="btn btn-sm btn-outline-primary" title="Ver detalle">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+                                            <a th:href="@{'/restauraciones/' + ${r.id} + '/gestion'}"
+                                                class="btn btn-sm btn-outline-warning" title="Gestionar estado">
+                                                <i class="fa-solid fa-arrows-rotate"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <nav>
+                            <ul id="paginacion" class="pagination-premium"></ul>
+                        </nav>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <script th:replace="~{fragments/scripts :: scripts}"></script>
+    <div th:replace="~{fragments/modal-confirmacion :: modalConfirmacion}"></div>
+    <div th:replace="~{fragments/modal-confirmacion :: modalScripts}"></div>
+    <script th:src="@{/js/general/paginacion.js}"></script>
+    <script th:src="@{/js/restauracion/lista-restauraciones.js}"></script>
+
+
+    <style>
+        /* Separación visual entre bloques de guía */
+        #tablaRestauraciones tr.guia-group-start>td {
+            border-top: 10px solid #adb5bd;
+            padding-top: 0.9rem !important;
+        }
+    </style>
+
+</body>
+
+</html>
