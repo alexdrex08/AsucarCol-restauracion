@@ -1,0 +1,222 @@
+<th:block xmlns:th="http://www.thymeleaf.org">
+
+    <div th:fragment="modalNovedades" class="modal fade" id="modalNovedades" tabindex="-1"
+        aria-labelledby="modalNovedadesLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl modal-dialog-scrollable">
+            <div class="modal-content border-0 shadow-lg overflow-hidden rounded-4">
+
+                <div class="row g-0">
+
+                    <!-- ═══════════════════════════════════════════
+                         PANEL IZQUIERDO: MARCA + VERSIÓN
+                         ═══════════════════════════════════════════ -->
+                    <div class="col-md-5 d-flex flex-column justify-content-center align-items-center text-white p-4 novedades-brand-panel"
+                        style="min-height: 460px; position: relative; overflow: hidden;">
+
+                        <!-- Patrón sutil de puntos -->
+                        <div class="novedades-pattern"></div>
+
+                        <div class="text-center position-relative" style="z-index: 1;">
+                            <img th:src="@{/img/logo_prototipo.png}" alt="Asuras Col" class="novedades-logo mb-3">
+                            <h3 class="fw-bold mb-1">Asuras Col</h3>
+                            <p class="small text-white-50 mb-4">Gestión de restauraciones</p>
+                            <span class="badge bg-white text-primary fw-bold px-3 py-2 rounded-pill"
+                                style="font-size: 0.95rem;" th:text="'Versión ' + ${appVersion}">Versión 2.2</span>
+                        </div>
+                    </div>
+
+                    <!-- ═══════════════════════════════════════════
+                         PANEL DERECHO: NOVEDADES EN PESTAÑAS
+                         ═══════════════════════════════════════════ -->
+                    <div class="col-md-7 d-flex flex-column p-4">
+
+                        <!-- Header -->
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <h4 class="fw-bold mb-1" id="modalNovedadesLabel">
+                                    <i class="fa-solid fa-gift text-primary me-2"></i>Novedades
+                                </h4>
+                                <p class="text-muted small mb-0">Esto es lo que cambió en esta versión</p>
+                            </div>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Cerrar"></button>
+                        </div>
+
+                        <!-- Pestañas -->
+                        <ul class="nav nav-tabs nav-fill mb-0" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active fw-semibold" data-bs-toggle="tab"
+                                    data-bs-target="#novedad-tab-alertas" type="button" role="tab">
+                                    <i class="fa-solid fa-bell me-1"></i>Alertas
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-semibold" data-bs-toggle="tab"
+                                    data-bs-target="#novedad-tab-estados" type="button" role="tab">
+                                    <i class="fa-solid fa-arrows-rotate me-1"></i>Estados
+                                </button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link fw-semibold" data-bs-toggle="tab"
+                                    data-bs-target="#novedad-tab-clientes" type="button" role="tab">
+                                    <i class="fa-solid fa-users me-1"></i>Clientes
+                                </button>
+                            </li>
+                        </ul>
+
+                        <!-- Contenido de pestañas -->
+                        <div class="tab-content flex-grow-1 py-3 px-1" style="min-height: 220px;">
+
+                            <!-- Tab Alertas -->
+                            <div class="tab-pane fade show active" id="novedad-tab-alertas" role="tabpanel">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-3 d-flex">
+                                        <i class="fa-solid fa-circle-check text-success mt-1 me-3"></i>
+                                        <div>
+                                            <strong>Alertas de contacto mensuales.</strong>
+                                            <p class="text-muted small mb-0">
+                                                Las restauraciones en tienda te avisan cada mes si el
+                                                cliente no las ha reclamado.
+                                            </p>
+                                        </div>
+                                    </li>
+                                    <li class="mb-3 d-flex">
+                                        <i class="fa-solid fa-circle-check text-success mt-1 me-3"></i>
+                                        <div>
+                                            <strong>Historial de alertas.</strong>
+                                            <p class="text-muted small mb-0">
+                                                Consulta todas las alertas generadas y las observaciones
+                                                de contacto desde el detalle de cada restauración.
+                                            </p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Tab Estados -->
+                            <div class="tab-pane fade" id="novedad-tab-estados" role="tabpanel">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-3 d-flex">
+                                        <i class="fa-solid fa-circle-check text-success mt-1 me-3"></i>
+                                        <div>
+                                            <strong>Nuevo estado "Abandono".</strong>
+                                            <p class="text-muted small mb-0">
+                                                Tras 4 meses sin ser reclamadas, las restauraciones pasan
+                                                automáticamente a este estado.
+                                            </p>
+                                        </div>
+                                    </li>
+                                    <li class="mb-3 d-flex">
+                                        <i class="fa-solid fa-circle-check text-success mt-1 me-3"></i>
+                                        <div>
+                                            <strong>Reapertura controlada.</strong>
+                                            <p class="text-muted small mb-0">
+                                                Si reabres una restauración finalizada, el sistema te pedirá
+                                                un motivo y lo registrará en el historial.
+                                            </p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <!-- Tab Clientes -->
+                            <div class="tab-pane fade" id="novedad-tab-clientes" role="tabpanel">
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-3 d-flex">
+                                        <i class="fa-solid fa-circle-check text-success mt-1 me-3"></i>
+                                        <div>
+                                            <strong>Tarjetas de cliente mejoradas.</strong>
+                                            <p class="text-muted small mb-0">
+                                                Ahora muestran cantidad de restauraciones, alertas
+                                                pendientes y disponibilidad de contacto de un vistazo.
+                                            </p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                        </div>
+
+                        <!-- Botón centrado -->
+                        <div class="text-center pt-2">
+                            <button type="button" class="btn btn-primary px-4 fw-bold" data-bs-dismiss="modal">
+                                Vamos allá
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estilos del panel izquierdo -->
+    <style th:fragment="novedadesEstilos">
+        .novedades-brand-panel {
+            background: linear-gradient(135deg, #0d6efd 0%, #0a4fa3 55%, #052a5c 100%);
+        }
+
+        .novedades-pattern {
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.10) 1px, transparent 1px);
+            background-size: 22px 22px;
+            pointer-events: none;
+        }
+
+        .novedades-logo {
+            max-width: 160px;
+            filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.35));
+        }
+
+        /* En móvil apilamos: panel arriba, contenido abajo */
+        @media (max-width: 767.98px) {
+            .novedades-brand-panel {
+                min-height: 220px !important;
+            }
+
+            .novedades-logo {
+                max-width: 100px;
+            }
+        }
+    </style>
+
+    <!-- Scripts -->
+    <script th:fragment="novedadesScripts" th:inline="javascript">
+        (function () {
+            const MOSTRAR_AHORA = /*[[${mostrarNovedadesAhora}]]*/ false;
+
+            console.log('[novedades] MOSTRAR_AHORA =', MOSTRAR_AHORA);
+
+            function intentarMostrar() {
+                const modalEl = document.getElementById('modalNovedades');
+                if (!modalEl) {
+                    console.warn('[novedades] modal no encontrado en el DOM');
+                    return;
+                }
+                if (!MOSTRAR_AHORA) {
+                    console.log('[novedades] no se muestra (flag=false)');
+                    return;
+                }
+                if (typeof bootstrap === 'undefined') {
+                    console.error('[novedades] bootstrap no está cargado');
+                    return;
+                }
+                console.log('[novedades] mostrando modal');
+                new bootstrap.Modal(modalEl).show();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', intentarMostrar);
+            } else {
+                // Por si el script se ejecuta después de DOMContentLoaded
+                intentarMostrar();
+            }
+
+            window.abrirNovedadesManualmente = function () {
+                const modalEl = document.getElementById('modalNovedades');
+                if (modalEl) new bootstrap.Modal(modalEl).show();
+            };
+        })();
+    </script>
+
+</th:block>

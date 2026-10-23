@@ -106,6 +106,30 @@
                                                     </small>
                                                 </div>
                                             </div>
+                                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                                <!-- Total restauraciones -->
+                                                <span
+                                                    class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25">
+                                                    <i class="fa-solid fa-screwdriver-wrench me-1"></i>
+                                                    <span th:text="${cliente.totalRestauraciones}">0</span>
+                                                    restauración(es)
+                                                </span>
+
+                                                <!-- Alertas pendientes (solo si hay) -->
+                                                <span th:if="${cliente.alertasPendientes > 0}"
+                                                    class="badge bg-warning text-dark border border-warning">
+                                                    <i class="fa-solid fa-bell me-1"></i>
+                                                    <span th:text="${cliente.alertasPendientes}">0</span> alerta(s)
+                                                </span>
+
+                                                <!-- Contacto disponible -->
+                                                <span class="badge bg-light text-dark border">
+                                                    <i class="fa-solid fa-phone me-1"
+                                                        th:classappend="${cliente.tieneTelefono} ? 'text-success' : 'text-muted'"></i>
+                                                    <i class="fa-solid fa-envelope ms-1 me-1"
+                                                        th:classappend="${cliente.tieneCorreo} ? 'text-success' : 'text-muted'"></i>
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
 

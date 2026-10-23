@@ -15,11 +15,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.sena.meciccolombia.mediccolombia.dao.BarrioDireccionDAO;
+import com.sena.meciccolombia.mediccolombia.dao.CorreoDAO;
+import com.sena.meciccolombia.mediccolombia.dao.TelefonoDAO;
 import com.sena.meciccolombia.mediccolombia.dao.TipoCorreoDAO;
 import com.sena.meciccolombia.mediccolombia.dao.TipoDireccionDAO;
 import com.sena.meciccolombia.mediccolombia.dao.TipoTelefonoDAO;
 import com.sena.meciccolombia.mediccolombia.security.MyUserDetails;
 import com.sena.meciccolombia.mediccolombia.service.ClienteService;
+import com.sena.meciccolombia.mediccolombia.service.IAlertaRestauracionService;
 import com.sena.meciccolombia.mediccolombia.service.IRestauracionService;
 import com.sena.meciccolombia.mediccolombia.web.dto.response.ClienteDetalleResponseDTO;
 import com.sena.meciccolombia.mediccolombia.web.dto.response.ClienteResponseDTO;
@@ -32,11 +35,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClienteViewController {
 
-    private final ClienteService clienteService;
     private final TipoCorreoDAO tipoCorreoDAO;
     private final TipoTelefonoDAO tipoTelefonoDAO;
     private final TipoDireccionDAO tipoDireccionDAO;
     private final BarrioDireccionDAO barrioDireccionDAO;
+    private final CorreoDAO correoDAO;
+    private final TelefonoDAO telefonoDAO;
+    private final IAlertaRestauracionService alertaRestauracionService;
+    private final ClienteService clienteService;
     private final IRestauracionService restauracionService;
 
     // ─────────────────────────────────────────────
@@ -56,6 +62,16 @@ public class ClienteViewController {
 
                     UltimaRestauracionDTO ultimaRest = restauracionService.obtenerUltimaPorCliente(cliente.getId());
                     datos.put("ultimaRestauracion", ultimaRest);
+
+                    long totalRest = restauracionService.listarPorCliente(cliente.getId()).size();
+                    long alertasPend = alertaRestauracionService.contarPendientesPorCliente(cliente.getId());
+                    boolean tieneTel = !telefonoDAO.findByClienteId(cliente.getId()).isEmpty();
+                    boolean tieneCorreo = !correoDAO.findByClienteId(cliente.getId()).isEmpty();
+
+                    datos.put("totalRestauraciones", totalRest);
+                    datos.put("alertasPendientes", alertasPend);
+                    datos.put("tieneTelefono", tieneTel);
+                    datos.put("tieneCorreo", tieneCorreo);
 
                     return datos;
                 })

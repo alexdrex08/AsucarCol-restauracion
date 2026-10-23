@@ -91,6 +91,12 @@ public class AlertaRestauracionServiceImpl implements IAlertaRestauracionService
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public long contarPendientesPorCliente(Long idCliente) {
+        return alertaDAO.countByRestauracion_Cliente_IdAndResueltaFalse(idCliente);
+    }
+
+    @Override
     @Transactional
     public AlertaRestauracionResponseDTO resolver(Long idAlerta, String observacion, Long idUsuario) {
         AlertaRestauracion alerta = alertaDAO.findById(idAlerta)

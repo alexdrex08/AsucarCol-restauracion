@@ -14,4 +14,6 @@ public interface AlertaRestauracionDAO extends JpaRepository<AlertaRestauracion,
     List<AlertaRestauracion> findByResueltaFalseOrderByFechaGeneracionAsc();
 
     long countByResueltaFalse();
+
+    long countByRestauracion_Cliente_IdAndResueltaFalse(Long idCliente);
 }

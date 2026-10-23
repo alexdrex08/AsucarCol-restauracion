@@ -1,18 +1,24 @@
-package com.sena.meciccolombia.mediccolombia.web.controller.view;
+package com.sena.meciccolombia.mediccolombia.web.controller.advice;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import lombok.extern.slf4j.Slf4j;
 
 import com.sena.meciccolombia.mediccolombia.service.ConfiguracionSistemaService;
 
+import jakarta.servlet.http.HttpSession;
 
-@ControllerAdvice(basePackages =
-    "com.sena.meciccolombia.mediccolombia.web.controller.view")
+@Slf4j
+@ControllerAdvice(basePackages = "com.sena.meciccolombia.mediccolombia.web.controller")
 public class GlobalModelAttributes {
 
     @Autowired
     private ConfiguracionSistemaService configuracionService;
+
+    @Value("${app.version:2.2}")
+    private String appVersionProperty;
 
     @ModelAttribute("nombreEmpresa")
     public String nombreEmpresa() {
@@ -21,7 +27,7 @@ public class GlobalModelAttributes {
 
     @ModelAttribute("nombreSistema")
     public String nombreSistema() {
-        return leer("nombre_sistema", "MedicColombia");
+        return leer("nombre_sistema", "Asuras Col");
     }
 
     @ModelAttribute("sloganEmpresa")
@@ -42,6 +48,23 @@ public class GlobalModelAttributes {
     @ModelAttribute("filasDashboard")
     public int filasDashboard() {
         return leerInt("filas_dashboard", 5);
+    }
+
+    // ── Novedades / versión de la app ────────────────────────────────
+
+    @ModelAttribute("appVersion")
+    public String appVersion() {
+        return appVersionProperty;
+    }
+
+    @ModelAttribute("mostrarNovedadesAhora")
+    public boolean mostrarNovedadesAhora(HttpSession session) {
+        Object flag = session.getAttribute("novedadesMostrar");
+        if (Boolean.TRUE.equals(flag)) {
+            session.removeAttribute("novedadesMostrar");
+            return true;
+        }
+        return false;
     }
 
     // ── helpers privados ──────────────────────────────────────────────

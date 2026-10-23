@@ -15,4 +15,6 @@ public interface IAlertaRestauracionService {
     AlertaRestauracionResponseDTO resolver(Long idAlerta, String observacion, Long idUsuario);
 
     List<AlertaRestauracionResponseDTO> listarPorRestauracion(Long idRestauracion);
+
+    long contarPendientesPorCliente(Long idCliente);
 }

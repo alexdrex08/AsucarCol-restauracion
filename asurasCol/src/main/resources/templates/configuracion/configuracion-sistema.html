@@ -105,9 +105,20 @@
                                                             inputmode="numeric" title="Solo números (máx. 4 dígitos)"
                                                             oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)">
 
+                                                        <!-- Booleano sí/no (NOVEDADES_AL_INICIAR) -->
+                                                        <select th:if="${confg.clave == 'NOVEDADES_AL_INICIAR'}"
+                                                            class="form-select form-select-sm"
+                                                            th:name="'clave_' + ${confg.clave}">
+                                                            <option value="true" th:selected="${confg.valor == 'true'}">
+                                                                Sí</option>
+                                                            <option value="false"
+                                                                th:selected="${confg.valor == 'false'}">No</option>
+                                                        </select>
+
                                                         <!-- Resto de configuraciones: input normal -->
-                                                        <input th:unless="${confg.clave == 'TIENDA_CODIGO'}" type="text"
-                                                            class="form-control form-control-sm"
+                                                        <input
+                                                            th:unless="${confg.clave == 'TIENDA_CODIGO' or confg.clave == 'NOVEDADES_AL_INICIAR'}"
+                                                            type="text" class="form-control form-control-sm"
                                                             th:name="'clave_' + ${confg.clave}"
                                                             th:value="${confg.valor}">
                                                     </div>
