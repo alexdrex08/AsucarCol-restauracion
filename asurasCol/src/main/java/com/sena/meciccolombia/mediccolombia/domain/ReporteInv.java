@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "ReporteInv")
+@Table(name = "reporte_inv")
 @Getter
 @Setter
 @NoArgsConstructor

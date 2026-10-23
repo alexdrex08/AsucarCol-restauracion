@@ -44,7 +44,6 @@ public class Usuario implements Serializable{
 
     private Boolean activo = true;
 
-
     @OneToMany(mappedBy = "usuario",cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

@@ -16,6 +16,7 @@ import com.sena.meciccolombia.mediccolombia.domain.Restauracion;
 import com.sena.meciccolombia.mediccolombia.security.MyUserDetails;
 import com.sena.meciccolombia.mediccolombia.service.AlertaInvService;
 import com.sena.meciccolombia.mediccolombia.service.ConfiguracionSistemaService;
+import com.sena.meciccolombia.mediccolombia.service.IAlertaRestauracionService;
 import com.sena.meciccolombia.mediccolombia.service.MovimientoProdService;
 import com.sena.meciccolombia.mediccolombia.service.ProductoService;
 import com.sena.meciccolombia.mediccolombia.service.ProveedorService;
@@ -34,6 +35,7 @@ public class DashboardViewController {
 
     private final ConfiguracionSistemaService configuracionService;
     private final DashboardRestauracionRestController dashboardRest;
+    private final IAlertaRestauracionService alertaRestauracionService;
     private final RestauracionDAO restauracionDAO;
 
     @GetMapping
@@ -66,6 +68,7 @@ public class DashboardViewController {
         modelo.addAttribute("enProceso", enProceso);
         modelo.addAttribute("devueltas", devueltas);
         modelo.addAttribute("finalizadas", finalizadas);
+        modelo.addAttribute("alertasPendientes", alertaRestauracionService.contarPendientes());
         modelo.addAttribute("ultimasRestauraciones", ultimas);
 
         if (devueltas > 0) {

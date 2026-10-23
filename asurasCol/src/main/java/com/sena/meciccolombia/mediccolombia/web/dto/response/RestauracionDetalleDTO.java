@@ -1,10 +1,15 @@
 package com.sena.meciccolombia.mediccolombia.web.dto.response;
 
+
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.*;
 
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class RestauracionDetalleDTO {
     private Long id;
     private String numeroSpv;
@@ -27,8 +32,13 @@ public class RestauracionDetalleDTO {
     private String observaciones;
     private List<HistorialResponseDTO> historial;
     private List<GuiaRestauracionResponseDTO> guias;
+    private List<AlertaRestauracionResponseDTO> alertas;
 
-    @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
     public static class ClienteInfo {
         private Long id;
         private String nombre;

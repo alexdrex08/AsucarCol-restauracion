@@ -5,7 +5,7 @@ import lombok.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "TipoRestauracion")
+@Table(name = "tipo_restauracion")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class TipoRestauracion implements Serializable {
     private static final long serialVersionUID = 1L;

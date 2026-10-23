@@ -8,8 +8,12 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "FotoRestauracion")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Table(name = "foto_restauracion")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 public class FotoRestauracion implements Serializable {
     private static final long serialVersionUID = 1L;

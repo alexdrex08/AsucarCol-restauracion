@@ -10,7 +10,11 @@ import java.util.List;
 
 @Entity
 @Table(name = "Restauracion")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 public class Restauracion implements Serializable {
     private static final long serialVersionUID = 1L;

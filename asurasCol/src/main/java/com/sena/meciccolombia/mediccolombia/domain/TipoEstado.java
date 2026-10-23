@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "TipoEstado")
+@Table(name = "tipo_estado")
 @Getter
 @Setter
 @NoArgsConstructor

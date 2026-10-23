@@ -52,6 +52,7 @@ public class RestauracionMapper {
                 .fechaLlegadaTienda(r.getFechaLlegadaTienda())
                 .fechaEntrega(r.getFechaEntrega())
                 .fechaDevolucion(r.getFechaDevolucion())
+                .estadoEsFinal(r.getEstadoActual().getEsFinal())
                 .observaciones(r.getObservaciones())
                 .historial(historial)
                 .guias(guias)

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/head :: head(titulo='Alertas de Contacto - Asuras Col')}"></head>
+
+<body class="toggled">
+    <header th:replace="~{fragments/header :: header}"></header>
+    <div class="d-flex" id="wrapper">
+        <div th:replace="~{fragments/sidebar :: menu}"></div>
+        <div id="page-content-wrapper">
+            <main class="container-fluid p-4 my-5">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h2 class="fw-bold mb-0">
+                            <i class="fa-solid fa-bell text-warning me-2"></i>Alertas de Contacto
+                        </h2>
+                        <p class="text-muted small mb-0">
+                            Restauraciones en tienda con más de 1 mes sin ser reclamadas.
+                            Recuerda contactar al cliente.
+                        </p>
+                    </div>
+                    <a th:href="@{/restauraciones}" class="btn btn-outline-secondary btn-sm">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Volver
+                    </a>
+                </div>
+
+                <div th:if="${totalAlertas == 0}" class="alert alert-success">
+                    <i class="fa-solid fa-circle-check me-2"></i>
+                    No hay alertas pendientes. Todas las restauraciones han sido atendidas.
+                </div>
+
+                <div th:if="${totalAlertas > 0}" class="card shadow-sm border-0">
+                    <div class="card-header bg-white fw-bold d-flex justify-content-between">
+                        <span><i class="fa-solid fa-list me-2"></i>Pendientes</span>
+                        <span class="badge bg-warning text-dark" th:text="${totalAlertas} + ' alerta(s)'"></span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover align-middle mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="ps-3"># SPV</th>
+                                        <th>Cliente</th>
+                                        <th>Mes</th>
+                                        <th>Llegada a tienda</th>
+                                        <th>Generada</th>
+                                        <th>Observación</th>
+                                        <th class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="a : ${alertas}">
+                                        <td class="ps-3 fw-bold font-monospace" th:text="${a.numeroSpv}"></td>
+                                        <td>
+                                            <div class="fw-semibold small" th:text="${a.nombreCliente}"></div>
+                                            <div class="text-muted small" th:text="${a.identificacionCliente}"></div>
+                                        </td>
+                                        <td>
+                                            <span class="badge"
+                                                th:classappend="${a.mesAlerta == 1} ? 'bg-warning text-dark' :
+                                                                  (${a.mesAlerta == 2} ? 'bg-orange text-white' : 'bg-danger')"
+                                                th:style="${a.mesAlerta == 2} ? 'background-color: #fd7e14 !important;' : ''"
+                                                th:text="'Mes ' + ${a.mesAlerta}"></span>
+                                        </td>
+                                        <td class="small text-muted"
+                                            th:text="${a.fechaLlegadaTienda != null ? #temporals.format(a.fechaLlegadaTienda, 'dd/MM/yyyy') : '—'}">
+                                        </td>
+                                        <td class="small text-muted"
+                                            th:text="${#temporals.format(a.fechaGeneracion, 'dd/MM/yyyy')}"></td>
+                                        <td class="small text-muted text-truncate" style="max-width: 200px;"
+                                            th:text="${a.observacion} ?: '—'"></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-outline-warning"
+                                                th:attr="data-id=${a.id}, data-spv=${a.numeroSpv}"
+                                                onclick="abrirModalContacto(this)">
+                                                <i class="fa-solid fa-phone me-1"></i>Registrar
+                                            </button>
+                                            <a th:href="@{'/restauraciones/' + ${a.idRestauracion}}"
+                                                class="btn btn-sm btn-outline-primary" title="Ver restauración">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MODAL: Registrar contacto -->
+                <div class="modal fade" id="modalContacto" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-warning text-dark">
+                                <h5 class="modal-title">
+                                    <i class="fa-solid fa-phone me-2"></i>Registrar contacto
+                                    <small class="text-dark-50">— SPV <span id="modalContactoSpv"></span></small>
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <input type="hidden" id="alertaIdContacto">
+                                <label class="form-label small fw-bold">
+                                    Observación del contacto *
+                                </label>
+                                <textarea id="inputObservacionContacto" class="form-control" rows="3"
+                                    placeholder="Ej: Se llamó al cliente, quedó en venir el 25/11..."></textarea>
+                                <small class="text-muted">
+                                    Al guardar, la alerta se marca como atendida y deja de aparecer en el listado.
+                                </small>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                                <button type="button" class="btn btn-warning text-dark fw-bold"
+                                    onclick="confirmarContacto()">
+                                    <i class="fa-solid fa-check me-1"></i>Marcar como atendida
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+    <footer th:replace="~{fragments/footer :: footer}"></footer>
+    <script th:replace="~{fragments/scripts :: scripts}"></script>
+    <script th:src="@{/js/restauracion/alertas-restauracion.js}"></script>
+</body>
+
+</html>

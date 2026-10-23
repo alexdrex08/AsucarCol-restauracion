@@ -6,10 +6,14 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "RestauracionGuia", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"restauracion_id", "guia_id"})
+@Table(name = "restauracion_guia", uniqueConstraints = {
+        @UniqueConstraint(columnNames = { "restauracion_id", "guia_id" })
 })
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class RestauracionGuia implements Serializable {
     private static final long serialVersionUID = 1L;
 

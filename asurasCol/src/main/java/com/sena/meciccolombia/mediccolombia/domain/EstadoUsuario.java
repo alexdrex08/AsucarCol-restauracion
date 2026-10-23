@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 @Entity
-@Table(name ="EstadoUsuario")
+@Table(name ="estado_usuario")
 @Getter
 @Setter
 @NoArgsConstructor

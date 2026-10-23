@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.sena.meciccolombia.mediccolombia.component.GuiaRestauracionMapper;
 import com.sena.meciccolombia.mediccolombia.component.HistorialRestauracionMapper;
 import com.sena.meciccolombia.mediccolombia.component.RestauracionMapper;
+import com.sena.meciccolombia.mediccolombia.dao.AlertaRestauracionDAO;
 import com.sena.meciccolombia.mediccolombia.dao.ClienteDAO;
 import com.sena.meciccolombia.mediccolombia.dao.EstadoRestauracionDAO;
 import com.sena.meciccolombia.mediccolombia.dao.FotoRestauracionDAO;
@@ -44,6 +45,7 @@ import com.sena.meciccolombia.mediccolombia.domain.TipoRestauracion;
 import com.sena.meciccolombia.mediccolombia.domain.Usuario;
 import com.sena.meciccolombia.mediccolombia.service.IRestauracionService;
 import com.sena.meciccolombia.mediccolombia.service.ConfiguracionSistemaService;
+import com.sena.meciccolombia.mediccolombia.service.IAlertaRestauracionService;
 import com.sena.meciccolombia.mediccolombia.web.dto.request.CambiarEstadoRequestDTO;
 import com.sena.meciccolombia.mediccolombia.web.dto.request.RestauracionRequestDTO;
 import com.sena.meciccolombia.mediccolombia.web.dto.response.EventoRestauracionDTO;
@@ -68,10 +70,12 @@ public class RestauracionServiceImpl implements IRestauracionService {
         private final RestauracionGuiaDAO restauracionGuiaDAO;
         private final HistorialRestauracionDAO historialRestauracionDAO;
         private final FotoRestauracionDAO fotoRestauracionDAO;
+        private final AlertaRestauracionDAO alertaRestauracionDAO;
         private final CorreoDAO correoDAO;
         private final TelefonoDAO telefonoDAO;
         private final TipoCorreoDAO tipoCorreoDAO;
         private final TipoTelefonoDAO tipoTelefonoDAO;
+        private final IAlertaRestauracionService alertaRestauracionService;
         private final RestauracionMapper restauracionMapper;
         private final HistorialRestauracionMapper historialMapper;
         private final GuiaRestauracionMapper guiaMapper;
@@ -172,8 +176,8 @@ public class RestauracionServiceImpl implements IRestauracionService {
                                 .usuarioRegistra(usuario)
                                 .tipoRestauracion(tipo)
                                 .estadoActual(estadoBorrador)
-                                .articulo(dto.getArticulo())
-                                .descripcion(dto.getDescripcion())
+                                .articulo("Restauracion")
+                                .descripcion(null)
                                 .telefonoContacto(dto.getTelefonoContacto())
                                 .correoContacto(dto.getCorreoContacto())
                                 .observaciones(dto.getObservaciones())
@@ -223,6 +227,7 @@ public class RestauracionServiceImpl implements IRestauracionService {
                                 .toList();
 
                 RestauracionDetalleDTO dto = restauracionMapper.toDetalleDTO(r, historial, guias);
+                dto.setAlertas(alertaRestauracionService.listarPorRestauracion(id));
 
                 // Poblar correos y teléfonos del cliente
                 List<String> correos = correoDAO.findByClienteId(r.getCliente().getId())
@@ -286,6 +291,13 @@ public class RestauracionServiceImpl implements IRestauracionService {
 
                 EstadoRestauracion estadoAnterior = r.getEstadoActual();
 
+                if (Boolean.TRUE.equals(estadoAnterior.getEsFinal())) {
+                        if (dto.getComentario() == null || dto.getComentario().isBlank()) {
+                                throw new IllegalStateException(
+                                                "Al reabrir una restauración finalizada debes indicar el motivo en el comentario.");
+                        }
+                }
+
                 if (estadoAnterior.getId().equals(estadoNuevo.getId())) {
                         throw new IllegalStateException("La restauración ya se encuentra en ese estado");
                 }
@@ -303,6 +315,15 @@ public class RestauracionServiceImpl implements IRestauracionService {
                         }
                 }
 
+                if ("Abandono".equals(estadoNuevo.getNombre())) {
+                        if (r.getFechaLlegadaTienda() == null
+                                        || !r.getFechaLlegadaTienda().isBefore(LocalDateTime.now().minusMonths(4))) {
+                                throw new IllegalStateException(
+                                                "El producto aún se encuentra en periodo para ser recogido. " +
+                                                                "Deben pasar al menos 4 meses desde su llegada a tienda para marcarlo como Abandono.");
+                        }
+                }
+
                 // Actualizar campos caché según el estado
                 switch (estadoNuevo.getNombre()) {
                         case "Tienda" -> r.setFechaLlegadaTienda(LocalDateTime.now());
@@ -311,6 +332,19 @@ public class RestauracionServiceImpl implements IRestauracionService {
                                 r.setUsuarioEntrega(usuario);
                         }
                         case "Devuelto Taller" -> r.setFechaDevolucion(LocalDateTime.now());
+                }
+
+                if ("Abandono".equals(estadoNuevo.getNombre())) {
+                        alertaRestauracionDAO.findByRestauracionIdAndResueltaFalse(idRestauracion)
+                                        .forEach(a -> {
+                                                a.setResuelta(true);
+                                                a.setFechaResolucion(LocalDateTime.now());
+                                                a.setUsuarioResolucion(usuario);
+                                                if (a.getObservacion() == null || a.getObservacion().isBlank()) {
+                                                        a.setObservacion("Cerrada al pasar manualmente a Abandono.");
+                                                }
+                                                alertaRestauracionDAO.save(a);
+                                        });
                 }
 
                 r.setEstadoActual(estadoNuevo);
@@ -425,6 +459,52 @@ public class RestauracionServiceImpl implements IRestauracionService {
                                                 .build();
                                 historialRestauracionDAO.save(h);
                                 r.setEstadoActual(estadoFinalizado);
+                                restauracionDAO.save(r);
+                        }
+                }
+        }
+
+        // ─────────────────────────────────────────────
+        // SCHEDULER — Marca como "Abandono" tras 3 meses en Tienda
+        // ─────────────────────────────────────────────
+        @Override
+        @Transactional
+        public void marcarAbandonadas() {
+                EstadoRestauracion estadoTienda = estadoRestauracionDAO.findByNombre("Tienda").orElse(null);
+                EstadoRestauracion estadoAbandono = estadoRestauracionDAO.findByNombre("Abandono").orElse(null);
+                if (estadoTienda == null || estadoAbandono == null)
+                        return;
+
+                LocalDateTime limite = LocalDateTime.now().minusMonths(4);
+
+                List<Restauracion> candidatas = restauracionDAO.findByEstadoActualId(estadoTienda.getId());
+                for (Restauracion r : candidatas) {
+                        if (r.getFechaLlegadaTienda() == null)
+                                continue;
+                        if (r.getFechaLlegadaTienda().isBefore(limite)) {
+                                HistorialRestauracion h = HistorialRestauracion.builder()
+                                                .restauracion(r)
+                                                .estadoAnterior(estadoTienda)
+                                                .estadoNuevo(estadoAbandono)
+                                                .usuario(r.getUsuarioRegistra())
+                                                .comentario("Producto marcado como Abandono automáticamente: " +
+                                                                "3 meses en tienda sin ser reclamado por el cliente.")
+                                                .esAutomatico(true)
+                                                .build();
+                                historialRestauracionDAO.save(h);
+                                r.setEstadoActual(estadoAbandono);
+
+                                alertaRestauracionDAO.findByRestauracionIdAndResueltaFalse(r.getId())
+                                                .forEach(a -> {
+                                                        a.setResuelta(true);
+                                                        a.setFechaResolucion(LocalDateTime.now());
+                                                        if (a.getObservacion() == null
+                                                                        || a.getObservacion().isBlank()) {
+                                                                a.setObservacion(
+                                                                                "Cerrada automáticamente al pasar la restauración a Abandono.");
+                                                        }
+                                                        alertaRestauracionDAO.save(a);
+                                                });
                                 restauracionDAO.save(r);
                         }
                 }

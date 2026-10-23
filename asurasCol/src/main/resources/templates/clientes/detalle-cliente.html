@@ -118,7 +118,6 @@
                                         <thead class="table-light">
                                             <tr>
                                                 <th class="ps-3"># SPV</th>
-                                                <th>Artículo</th>
                                                 <th>Estado</th>
                                                 <th>Fecha</th>
                                                 <th class="text-center">Ver</th>
@@ -127,7 +126,6 @@
                                         <tbody>
                                             <tr th:each="r : ${restauracionesCliente}">
                                                 <td class="ps-3 fw-bold" th:text="${r.numeroSpv}"></td>
-                                                <td th:text="${r.articulo}"></td>
                                                 <td>
                                                     <span class="badge bg-primary" th:text="${r.estadoActual}"></span>
                                                 </td>

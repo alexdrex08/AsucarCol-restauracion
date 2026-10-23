@@ -68,10 +68,26 @@ function cambiarEstado() {
     const estadoTexto = document.getElementById('selectEstadoNuevo').options[
         document.getElementById('selectEstadoNuevo').selectedIndex].text;
 
+    if (ESTADO_FINAL) {
+        const comentario = document.getElementById('inputComentarioEstado').value.trim();
+        if (!comentario) {
+            mostrarMensajeSistema(
+                'Comentario requerido',
+                'Al reabrir una restauración finalizada debes indicar el motivo en el comentario.',
+                'warning'
+            );
+            return;
+        }
+    }
+
+    const mensaje = ESTADO_FINAL
+        ? `¿Reabrir esta restauración del estado <strong>${ESTADO_ACTUAL}</strong> al nuevo estado <strong>${estadoTexto}</strong>? Esta acción quedará registrada en el historial.`
+        : `¿Confirmas el cambio al estado <strong>${estadoTexto}</strong>?`;
+
     mostrarModalConfirmacion(
         'Cambiar estado',
-        `¿Confirmas el cambio al estado <strong>${estadoTexto}</strong>?`,
-        'info',
+        mensaje,
+        ESTADO_FINAL ? 'warning' : 'info',
         async function () {
             const formData = new FormData();
             formData.append('idEstadoNuevo', idEstado);

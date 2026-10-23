@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.List;
 
 @Entity
-@Table(name = "EstadoPedido")
+@Table(name = "estado_pedido")
 @Getter
 @Setter
 @NoArgsConstructor

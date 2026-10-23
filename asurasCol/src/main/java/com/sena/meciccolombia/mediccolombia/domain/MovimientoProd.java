@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.CreatedDate;
 
 @Entity
-@Table(name = "MovimientoProd")
+@Table(name = "movimiento_prod")
 @Getter
 @Setter
 @NoArgsConstructor

@@ -42,6 +42,13 @@
                                 </div>
 
                                 <div class="mb-3">
+                                    <div th:if="${restauracion.estadoEsFinal}" class="alert alert-warning py-2 mb-3">
+                                        <i class="fa-solid fa-lock me-2"></i>
+                                        <strong>Restauración cerrada.</strong>
+                                        Esta restauración está en estado
+                                        <strong th:text="${restauracion.estadoActual}"></strong>.
+                                        Cambiarla de estado reabrirá el proceso y quedará registrado en el historial.
+                                    </div>
                                     <label class="form-label small fw-bold">Nuevo estado *</label>
                                     <select id="selectEstadoNuevo" class="form-select" required>
                                         <option value="">Selecciona...</option>
@@ -134,6 +141,8 @@
 
     <script th:inline="javascript">
         const RESTAURACION_ID = /*[[${restauracion.id}]]*/ 0;
+        const ESTADO_ACTUAL = /*[[${restauracion.estadoActual}]]*/ '';
+        const ESTADO_FINAL = /*[[${restauracion.estadoEsFinal}]]*/ false;
     </script>
     <script th:src="@{/js/restauracion/gestion-estado.js}"></script>
 

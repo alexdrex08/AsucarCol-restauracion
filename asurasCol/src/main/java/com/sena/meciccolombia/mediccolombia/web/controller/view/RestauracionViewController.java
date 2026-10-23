@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.sena.meciccolombia.mediccolombia.security.MyUserDetails;
 import com.sena.meciccolombia.mediccolombia.service.ConfiguracionSistemaService;
+import com.sena.meciccolombia.mediccolombia.service.IAlertaRestauracionService;
 import com.sena.meciccolombia.mediccolombia.service.IEstadoRestauracionService;
 import com.sena.meciccolombia.mediccolombia.service.IRestauracionService;
 import com.sena.meciccolombia.mediccolombia.service.ITipoRestauracionService;
@@ -28,6 +29,7 @@ public class RestauracionViewController {
     private final ITipoRestauracionService tipoRestauracionService;
     private final IEstadoRestauracionService estadoRestauracionService;
     private final ConfiguracionSistemaService configuracionService;
+    private final IAlertaRestauracionService alertaRestauracionService;
 
     // ─────────────────────────────────────────────
     // GET /restauraciones — lista
@@ -82,5 +84,16 @@ public class RestauracionViewController {
         model.addAttribute("estados", estadoRestauracionService.listar());
         model.addAttribute("vistaActiva", "restauraciones-gestion");
         return "restauraciones/gestion-estado";
+    }
+
+    // ─────────────────────────────────────────────
+    // GET /restauraciones/alertas — Alertas
+    // ─────────────────────────────────────────────
+    @GetMapping("/alertas")
+    public String alertas(Model model) {
+        model.addAttribute("alertas", alertaRestauracionService.listarPendientes());
+        model.addAttribute("totalAlertas", alertaRestauracionService.contarPendientes());
+        model.addAttribute("vistaActiva", "restauraciones-alertas");
+        return "restauraciones/alertas-restauracion";
     }
 }

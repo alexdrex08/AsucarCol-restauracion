@@ -9,8 +9,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "HistorialRestauracion")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Table(name = "historial_restauracion")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @EntityListeners(AuditingEntityListener.class)
 public class HistorialRestauracion implements Serializable {
     private static final long serialVersionUID = 1L;

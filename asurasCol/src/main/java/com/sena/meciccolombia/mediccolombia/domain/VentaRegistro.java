@@ -11,7 +11,7 @@ import java.util.List;
 import org.springframework.data.annotation.CreatedDate;
 
 @Entity
-@Table(name = "VentaRegistro")
+@Table(name = "venta_registro")
 @Getter
 @Setter
 @NoArgsConstructor

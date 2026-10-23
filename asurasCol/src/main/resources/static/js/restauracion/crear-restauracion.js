@@ -160,8 +160,6 @@ async function enviarFormulario(crearCliente) {
     formData.append('numeroSpv', document.getElementById('inputSpv').value);
     formData.append('identificacionCliente', document.getElementById('inputCcCliente').value);
     formData.append('idTipoRestauracion', document.getElementById('inputIdTipoRestauracion').value);
-    formData.append('articulo', document.getElementById('inputArticulo').value);
-    formData.append('descripcion', document.getElementById('inputDescripcion').value || '');
     formData.append('observaciones', document.getElementById('inputObservaciones').value || '');
     formData.append('numeroGuia', document.getElementById('inputGuia').value || '');
     formData.append('transportadora', document.getElementById('inputTransportadora').value || '');

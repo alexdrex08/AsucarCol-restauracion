@@ -74,8 +74,6 @@ public class RestauracionApiController {
             @RequestParam(required = false) String telefonoContacto,
             @RequestParam(required = false) String correoContacto,
             @RequestParam Long idTipoRestauracion,
-            @RequestParam String articulo,
-            @RequestParam(required = false) String descripcion,
             @RequestParam(required = false) String observaciones,
             @RequestParam(required = false) String numeroGuia,
             @RequestParam(required = false) String transportadora,
@@ -92,8 +90,6 @@ public class RestauracionApiController {
                     .telefonoContacto(telefonoContacto)
                     .correoContacto(correoContacto)
                     .idTipoRestauracion(idTipoRestauracion)
-                    .articulo(articulo)
-                    .descripcion(descripcion)
                     .observaciones(observaciones)
                     .numeroGuia(numeroGuia)
                     .transportadora(transportadora)

@@ -75,9 +75,6 @@
                                 <p class="mb-2 small"><strong>Artículo:</strong>
                                     <span th:text="${restauracion.articulo}"></span>
                                 </p>
-                                <p class="mb-2 small"><strong>Descripción:</strong>
-                                    <span th:text="${restauracion.descripcion} ?: '—'"></span>
-                                </p>
                             </div>
                         </div>
 
@@ -127,6 +124,54 @@
                                                 th:text="${g.fechaCreacion != null ? #temporals.format(g.fechaCreacion, 'dd/MM/yyyy') : ''}"></span>
                                         </div>
                                         <div class="text-muted" th:text="${g.transportadora} ?: ''"></div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- ALERTAS DE CONTACTO -->
+                        <div class="card shadow-sm border-0 mt-3"
+                            th:if="${restauracion.alertas != null and !restauracion.alertas.isEmpty()}">
+                            <div
+                                class="card-header bg-white fw-bold border-bottom d-flex justify-content-between align-items-center">
+                                <span><i class="fa-solid fa-bell me-2 text-warning"></i>Alertas de Contacto</span>
+                                <span class="badge bg-secondary"
+                                    th:text="${#lists.size(restauracion.alertas)} + ' alerta(s)'"></span>
+                            </div>
+                            <div class="card-body p-0">
+                                <ul class="list-group list-group-flush">
+                                    <li th:each="a : ${restauracion.alertas}" class="list-group-item">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge" th:classappend="${a.resuelta} ? 'bg-success' :
+                                          (${a.mesAlerta == 1} ? 'bg-warning text-dark' :
+                                          (${a.mesAlerta == 2} ? 'bg-orange text-white' : 'bg-danger'))"
+                                                th:style="${a.mesAlerta == 2 and !a.resuelta} ? 'background-color: #fd7e14 !important;' : ''"
+                                                th:text="'Mes ' + ${a.mesAlerta}"></span>
+                                            <small class="text-muted">
+                                                Creada: <span
+                                                    th:text="${#temporals.format(a.fechaGeneracion, 'dd/MM/yyyy')}"></span>
+                                            </small>
+                                        </div>
+
+                                        <!-- Estado -->
+                                        <div th:if="${a.resuelta}" class="small text-success mb-1">
+                                            <i class="fa-solid fa-circle-check me-1"></i>
+                                            Resuelta:
+                                            <span
+                                                th:text="${a.fechaResolucion != null ? #temporals.format(a.fechaResolucion, 'dd/MM/yyyy HH:mm') : '—'}"></span>
+                                            <span th:if="${a.usuarioResolucion != null}"
+                                                th:text="' por ' + ${a.usuarioResolucion}"></span>
+                                            <span th:if="${a.usuarioResolucion == null}" class="fst-italic">
+                                                (automática)</span>
+                                        </div>
+                                        <div th:if="${!a.resuelta}" class="small fw-semibold mb-1"
+                                            style="color: #fd7e14;">
+                                            <i class="fa-solid fa-hourglass-half me-1"></i>Pendiente de contacto
+                                        </div>
+
+                                        <!-- Observación -->
+                                        <p class="small text-muted mb-0"
+                                            th:if="${a.observacion != null and !a.observacion.isBlank()}"
+                                            th:text="${a.observacion}"></p>
                                     </li>
                                 </ul>
                             </div>

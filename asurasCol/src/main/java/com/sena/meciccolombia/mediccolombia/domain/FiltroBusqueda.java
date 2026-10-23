@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "FiltroBusqueda")
+@Table(name = "filtro_busqueda")
 @Getter
 @Setter
 @NoArgsConstructor
