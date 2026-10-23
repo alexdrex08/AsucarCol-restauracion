@@ -29,6 +29,8 @@
     <script th:fragment="modalScripts">
         function mostrarModalConfirmacion(titulo, mensaje, tipo = 'warning', onConfirm, textoBotonConfirmar = 'Confirmar', soloMensaje = false) {
             const header = document.getElementById('modalConfirmacionHeader');
+            const label = document.getElementById('modalConfirmacionLabel');
+
             const iconos = {
                 danger: 'fa-solid fa-circle-exclamation',
                 warning: 'fa-solid fa-triangle-exclamation',
@@ -36,18 +38,28 @@
                 success: 'fa-solid fa-check-circle'
             };
             const colores = {
-                danger: 'bg-danger text-white',
-                warning: 'bg-warning text-dark',
-                info: 'bg-info text-white',
-                success: 'bg-success text-white'
+                danger: 'bg-danger',
+                warning: 'bg-warning',
+                info: 'bg-info',
+                success: 'bg-success'
+            };
+            // Qué color de texto corresponde al fondo
+            const textoHeader = {
+                danger: 'text-white',
+                warning: 'text-dark',
+                info: 'text-dark',    // ← cyan + blanco no contrasta; usamos dark
+                success: 'text-white'
             };
 
-            header.className = `modal-header ${colores[tipo] || 'bg-warning text-dark'}`;
+            header.className = `modal-header ${colores[tipo] || 'bg-warning'} ${textoHeader[tipo] || 'text-dark'}`;
 
-            document.getElementById('modalConfirmacionLabel').innerHTML = `
-                <i class="${iconos[tipo] || 'fa-solid fa-triangle-exclamation'} me-2"></i>
-                ${titulo}
-            `;
+            // Forzamos el color del título por si el tema lo sobreescribe
+            label.className = 'modal-title ' + (textoHeader[tipo] || 'text-dark');
+
+            label.innerHTML = `
+            <i class="${iconos[tipo] || 'fa-solid fa-triangle-exclamation'} me-2"></i>
+            ${titulo}
+        `;
 
             document.getElementById('modalConfirmacionBody').innerHTML = mensaje;
 
@@ -80,7 +92,6 @@
             modal.show();
         }
 
-        // Helper genérico para mostrar solo mensajes (sin confirmación)
         function mostrarMensajeSistema(titulo, mensaje, tipo = 'info') {
             mostrarModalConfirmacion(titulo, mensaje, tipo, null, 'Entendido', true);
         }
